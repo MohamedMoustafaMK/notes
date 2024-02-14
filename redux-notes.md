@@ -1,12 +1,13 @@
 # Redux
 
--   Step 1: Install Redux Toolkit and Redux Persist
+-   ### Step 1: Install Redux Toolkit and Redux Persist
 
     ```bash
     npm install @reduxjs/toolkit react-redux redux-persist
     ```
 
--   Step 2: Create a Redux slice for the counter
+-   ### Step 2: Create a Redux slice for the counter
+
     Create a file named `counterSlice.js` to define the reducer logic using createSlice from RTK.
 
     ```jsx
@@ -36,7 +37,8 @@
     export default counterSlice.reducer
     ```
 
--   Step 3: Set up your Redux store with Redux Persist
+-   ### Step 3: Set up your Redux store with Redux Persist
+
     Create a file named `store.js` to configure your Redux store with Redux Persist.
 
     ```jsx
@@ -75,7 +77,7 @@
     export { store, persistor }
     ```
 
-    <br>
+      <br>
 
     ## what is Persistor?
 
@@ -115,9 +117,10 @@
 
     Remember that using `PersistGate` is optional, and if you don't need to control the rendering based on the state rehydration status, you can choose not to use it.
 
-<br>
+    <br>
 
--   Step 4: Connect the Redux store to your React app with Redux Persist
+-   ### Step 4: Connect the Redux store to your React app with Redux Persist
+
     In your `index.js` file, wrap your `App` component with the `PersistGate` from `redux-persist/integration/react` to ensure the persistence is applied before rendering your app.
 
     ```jsx
@@ -139,7 +142,8 @@
     )
     ```
 
--   Step 5: Use the counter state in your React component
+-   ### Step 5: Use the counter state in your React component
+
     Now, you can use the counter state in your React components as before. The Redux state should persist in the local storage.
 
     ```jsx
