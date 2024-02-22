@@ -1,7 +1,3 @@
-As of my last knowledge update in January 2022, I don't have specific information on an "rtk-query" library. However, I can provide you with a general guide on how to use a typical API client library in a programming language like JavaScript or Python. If "rtk-query" is a specific library or tool released after my last update, I recommend checking the official documentation for the most accurate and up-to-date information.
-
-Here's a general guide on using an API client library:
-
 1. **Installation:**
    - Use a package manager to install the library. For example, if you're using npm for JavaScript, you might run: 
      ```
