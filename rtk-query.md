@@ -61,25 +61,59 @@ Remember to check the official documentation for the library you are using, as t
 2. **Configure API Client with Axios:**
    Create an API client configuration using Axios for the `baseQuery`.
 
-   ```javascript
-   // api.js (or wherever you configure your API)
-   import { createApi, fetchBaseQuery } from 'rtk-query';
-   import axios from 'axios';
+    ```javascript
+    // api.js (or wherever you configure your API)
+    import { createApi } from '@reduxjs/toolkit/query/react'
+    import axios from 'axios'
 
-   const api = createApi({
-     baseQuery: fetchBaseQuery({
-       baseUrl: 'https://api.example.com',
-       // Configure Axios options here if needed
-     }),
-     endpoints: (builder) => ({
-       getUsers: builder.query({
-         query: () => 'users',
-       }),
-     }),
-   });
+    const axiosBaseQuery =
+      ({ baseUrl } = { baseUrl: '' }) =>
+      async ({ url, method, data, params, headers }) => {
+        try {
+          const response = await axios({
+            url: baseUrl + url,
+            method,
+            data,
+            params,
+            headers,
+          })
+          return { data: response.data }
+        } catch (err) {
+          const errorMessage = err.response
+            ? err.response.data.message
+            : err.message
+          return {
+            error: {
+              status: err.response?.status,
+              data: errorMessage,
+            },
+          }
+        }
+      }
 
-   export const { useGetUsersQuery } = api;
-   ```
+    export const api = createApi({
+      baseQuery: axiosBaseQuery({
+        baseUrl: 'http://127.0.0.1:3000',
+        tagTypes: ['Posts'],
+      }),
+      endpoints: (builder) => ({
+        getCatFacts: builder.query({
+          query: () => ({ url: '/get', method: 'get' }),
+          transformResponse: (response) => response.data,
+        }),
+        postData: builder.mutation({
+          query: (body) => ({
+            url: '/api/v1/users/signup',
+            method: 'POST',
+            data: body,
+          }),
+          invalidatesTags: ['Posts'],
+          transformResponse: (response) => response.data.newUser,
+        }),
+      }),
+    })
+    export const { useGetCatFactsQuery, usePostDataMutation } = api
+    ```
 
 3. **Use the API Endpoint in Your Component:**
    Now, you can use the generated query hook in your component:
