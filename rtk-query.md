@@ -62,10 +62,11 @@ Remember to check the official documentation for the library you are using, as t
    Create an API client configuration using Axios for the `baseQuery`.
 
     ```javascript
-    // api.js (or wherever you configure your API)
+    // api.js
     import { createApi } from '@reduxjs/toolkit/query/react'
     import axios from 'axios'
 
+    //axios baseQuery funciton
     const axiosBaseQuery =
       ({ baseUrl } = { baseUrl: '' }) =>
       async ({ url, method, data, params, headers }) => {
@@ -107,7 +108,7 @@ Remember to check the official documentation for the library you are using, as t
             method: 'POST',
             data: body,
           }),
-          invalidatesTags: ['Posts'],
+          invalidatesTags: ['Posts'], //is a must to update the data in get
           transformResponse: (response) => response.data.newUser,
         }),
       }),
