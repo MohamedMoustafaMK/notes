@@ -176,3 +176,111 @@
 
     export default App
     ```
+
+
+# Redux Toolkit Async Thunk
+
+## Introduction
+
+This repository provides information about using Redux Toolkit's Async Thunk middleware for handling asynchronous actions in your Redux applications.
+
+## Usage
+
+### Installation
+
+To use Redux Toolkit and Async Thunk, you need to install `@reduxjs/toolkit`:
+
+```bash
+npm install @reduxjs/toolkit
+```
+
+### Creating an Async Thunk
+
+1. Define an async function that contains the asynchronous logic you want to perform.
+
+```javascript
+// asyncActions.js
+export const fetchData = async (apiEndpoint) => {
+  const response = await fetch(apiEndpoint);
+  const data = await response.json();
+  return data;
+};
+```
+
+2. Create an Async Thunk using the `createAsyncThunk` function from Redux Toolkit.
+
+```javascript
+// asyncActions.js
+import { createAsyncThunk } from '@reduxjs/toolkit';
+
+export const fetchUserData = createAsyncThunk(
+  'user/fetchUserData',
+  async (apiEndpoint) => {
+    const response = await fetch(apiEndpoint);
+    const data = await response.json();
+    return data;
+  }
+);
+```
+
+### Reducer with Async Thunk
+
+Create a reducer that handles the pending, fulfilled, and rejected states of the async action:
+
+```javascript
+// userReducer.js
+import { createSlice } from '@reduxjs/toolkit';
+import { fetchUserData } from './asyncActions';
+
+const userSlice = createSlice({
+  name: 'user',
+  initialState: { data: null, status: 'idle', error: null },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserData.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchUserData.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.data = action.payload;
+      })
+      .addCase(fetchUserData.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      });
+  },
+});
+
+export default userSlice.reducer;
+```
+
+### Dispatch Async Thunk
+
+Dispatch the Async Thunk in your component or elsewhere in your application:
+
+```javascript
+// App.js
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserData } from './asyncActions';
+
+function App() {
+  const dispatch = useDispatch();
+  const userData = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(fetchUserData('https://api.example.com/user'));
+  }, [dispatch]);
+
+  return (
+    <div>
+      {userData.status === 'loading' && <p>Loading...</p>}
+      {userData.status === 'succeeded' && <p>User Data: {userData.data}</p>}
+      {userData.status === 'failed' && <p>Error: {userData.error}</p>}
+    </div>
+  );
+}
+
+export default App;
+```
