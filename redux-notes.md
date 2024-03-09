@@ -284,3 +284,128 @@ function App() {
 
 export default App;
 ```
+
+
+# Redux Toolkit Data Normalization
+
+## Introduction
+
+This repository provides information about using Redux Toolkit's `createEntityAdapter` for data normalization in your Redux applications.
+
+## Usage
+
+### Installation
+
+To use Redux Toolkit, you need to install `@reduxjs/toolkit`:
+
+```bash
+npm install @reduxjs/toolkit
+```
+
+### Creating an Entity Adapter
+
+1. Create an Entity Adapter using the `createEntityAdapter` function from Redux Toolkit.
+
+```javascript
+// userAdapter.js
+import { createEntityAdapter } from '@reduxjs/toolkit';
+
+const userAdapter = createEntityAdapter();
+
+export default userAdapter;
+```
+
+### Creating a Slice with Entity Adapter
+
+2. Create a slice that uses the Entity Adapter to handle user entities.
+
+```javascript
+// userSlice.js
+import { createSlice } from '@reduxjs/toolkit';
+import userAdapter from './userAdapter';
+
+const userSlice = createSlice({
+  name: 'users',
+  initialState: userAdapter.getInitialState(),
+  reducers: {
+    // Additional reducers can be added here
+  },
+});
+
+export const { selectAll: selectAllUsers, selectById: selectUserById } = userAdapter.getSelectors((state) => state.users);
+
+export default userSlice.reducer;
+```
+
+### Adding Async Thunk with Normalized Data
+
+3. If you have an async operation that fetches user data, you can use Async Thunk along with the Entity Adapter:
+
+```javascript
+// asyncActions.js
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import userAdapter from './userAdapter';
+
+export const fetchUserData = createAsyncThunk('users/fetchUserData', async (apiEndpoint) => {
+  const response = await fetch(apiEndpoint);
+  const data = await response.json();
+  return data;
+});
+
+// userSlice.js
+import { createSlice } from '@reduxjs/toolkit';
+import userAdapter from './userAdapter';
+import { fetchUserData } from './asyncActions';
+
+const userSlice = createSlice({
+  name: 'users',
+  initialState: userAdapter.getInitialState(),
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserData.fulfilled, (state, action) => {
+        userAdapter.setAll(state, action.payload);
+      });
+  },
+});
+
+export const { selectAll: selectAllUsers, selectById: selectUserById } = userAdapter.getSelectors((state) => state.users);
+
+export default userSlice.reducer;
+```
+
+### Dispatch Async Thunk
+
+4. Dispatch the Async Thunk in your component or elsewhere in your application:
+
+```javascript
+// App.js
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserData } from './asyncActions';
+import { selectAllUsers } from './userSlice';
+
+function App() {
+  const dispatch = useDispatch();
+  const users = useSelector(selectAllUsers);
+
+  useEffect(() => {
+    dispatch(fetchUserData('https://api.example.com/users'));
+  }, [dispatch]);
+
+  return (
+    <div>
+      <h1>User List</h1>
+      {users.map((user) => (
+        <div key={user.id}>
+          <p>User ID: {user.id}</p>
+          <p>Name: {user.name}</p>
+          {/* Additional user details */}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default App;
+```
